@@ -6,7 +6,12 @@ import { getEnvVar } from './utils/getEnvVar.js';
 import contactsRouter from './routers/contacts.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import cookieParser from 'cookie-parser';
+import authRouter from './routers/auth.js';
 
+// ...
+app.use(cookieParser());
+app.use('/auth', authRouter);
 const PORT = Number(getEnvVar('PORT', '3000'));
 
 export const setupServer = () => {
