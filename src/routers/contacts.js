@@ -14,6 +14,8 @@ import Joi from 'joi';
 
 const router = express.Router();
 
+router.use(authenticate);
+
 const contactSchema = Joi.object({
   name: Joi.string().min(3).max(20).required(),
   phoneNumber: Joi.string().min(3).max(20).required(),
@@ -30,47 +32,14 @@ const contactUpdateSchema = Joi.object({
   contactType: Joi.string().valid('work', 'home', 'personal').optional(),
 });
 
-router.use(authenticate);
+router.get('/', ctrlWrapper(getAllContacts));
 
-router.get('/', ctrlWrapper(async (req, res) => {
-  const contacts = await getAllContacts(req.user._id);
-  res.json({
-    status: 200,
-    message: 'Successfully found contacts!',
-    data: contacts,
-  });
-}));
+router.get('/:contactId', isValidId, ctrlWrapper(getContactById));
 
-router.get('/:contactId', isValidId, ctrlWrapper(async (req, res) => {
-  const contact = await getContactById(req.params.contactId, req.user._id);
-  res.json({
-    status: 200,
-    message: 'Successfully found contact!',
-    data: contact,
-  });
-}));
+router.post('/', validateBody(contactSchema), ctrlWrapper(createContact));
 
-router.post('/', validateBody(contactSchema), ctrlWrapper(async (req, res) => {
-  const newContact = await createContact({ ...req.body, userId: req.user._id });
-  res.status(201).json({
-    status: 201,
-    message: 'Successfully created a contact!',
-    data: newContact,
-  });
-}));
+router.patch('/:contactId', isValidId, validateBody(contactUpdateSchema), ctrlWrapper(updateContact));
 
-router.patch('/:contactId', isValidId, validateBody(contactUpdateSchema), ctrlWrapper(async (req, res) => {
-  const updatedContact = await updateContact(req.params.contactId, req.body, req.user._id);
-  res.json({
-    status: 200,
-    message: 'Successfully patched a contact!',
-    data: updatedContact,
-  });
-}));
-
-router.delete('/:contactId', isValidId, ctrlWrapper(async (req, res) => {
-  await deleteContact(req.params.contactId, req.user._id);
-  res.status(204).send();
-}));
+router.delete('/:contactId', isValidId, ctrlWrapper(deleteContact));
 
 export default router;
