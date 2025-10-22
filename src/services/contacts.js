@@ -1,10 +1,7 @@
 import { Contact } from '../models/contact.js';
 
 export const getAllContactsService = async (userId, skip, limit) => {
-  const contacts = await Contact.find({ userId })
-    .skip(skip)
-    .limit(limit);
-  return contacts;
+  return await Contact.find({ userId }).skip(skip).limit(limit);
 };
 
 export const getContactByIdService = async (contactId, userId) => {
