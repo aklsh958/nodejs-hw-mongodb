@@ -1,26 +1,24 @@
-import { ContactsCollection } from '../models/contact.js';
+import { Contact } from '../models/contact.js';
 
-export const getAllContacts = async ({ page, perPage, sortBy, sortOrder, filter }) => {
-  const skip = (page - 1) * perPage;
-  const totalItems = await ContactsCollection.countDocuments(filter);
-
-  const contacts = await ContactsCollection.find(filter)
-    .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
+export const getAllContactsService = async (userId, skip, limit) => {
+  const contacts = await Contact.find({ userId })
     .skip(skip)
-    .limit(Number(perPage));
-
-  return {
-    data: contacts,
-    page: Number(page),
-    perPage: Number(perPage),
-    totalItems,
-    totalPages: Math.ceil(totalItems / perPage),
-    hasPreviousPage: page > 1,
-    hasNextPage: page * perPage < totalItems,
-  };
+    .limit(limit);
+  return contacts;
 };
 
-export const getContactById = async (id) => ContactsCollection.findById(id);
-export const createContact = async (data) => ContactsCollection.create(data);
-export const updateContact = async (id, data) => ContactsCollection.findByIdAndUpdate(id, data, { new: true });
-export const deleteContact = async (id) => ContactsCollection.findByIdAndDelete(id);
+export const getContactByIdService = async (contactId, userId) => {
+  return await Contact.findOne({ _id: contactId, userId });
+};
+
+export const createContactService = async (data) => {
+  return await Contact.create(data);
+};
+
+export const updateContactService = async (contactId, userId, data) => {
+  return await Contact.findOneAndUpdate({ _id: contactId, userId }, data, { new: true });
+};
+
+export const deleteContactService = async (contactId, userId) => {
+  return await Contact.findOneAndDelete({ _id: contactId, userId });
+};
