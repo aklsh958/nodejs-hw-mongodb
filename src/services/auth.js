@@ -33,7 +33,7 @@ export const loginUser = async ({ email, password }) => {
   const accessTokenValidUntil = addMinutes(new Date(), 15);
   const refreshTokenValidUntil = addDays(new Date(), 30);
 
-  await Session.create({
+  const session = await Session.create({
     userId: user._id,
     accessToken,
     refreshToken,
@@ -41,11 +41,11 @@ export const loginUser = async ({ email, password }) => {
     refreshTokenValidUntil,
   });
 
-  return { accessToken, refreshToken };
+  return { accessToken, refreshToken, session };
 };
 
-export const refreshSession = async (refreshToken) => {
-  const session = await Session.findOne({ refreshToken });
+export const refreshSession = async (refreshToken, sessionId) => {
+  const session = await Session.findOne({ _id: sessionId, refreshToken });
   if (!session) throw createHttpError(401, 'Session not found');
 
   if (isBefore(session.refreshTokenValidUntil, new Date())) {
@@ -60,7 +60,7 @@ export const refreshSession = async (refreshToken) => {
   const accessTokenValidUntil = addMinutes(new Date(), 15);
   const refreshTokenValidUntil = addDays(new Date(), 30);
 
-  await Session.create({
+  const newSession = await Session.create({
     userId: session.userId,
     accessToken,
     refreshToken: newRefreshToken,
@@ -68,9 +68,9 @@ export const refreshSession = async (refreshToken) => {
     refreshTokenValidUntil,
   });
 
-  return { accessToken, refreshToken: newRefreshToken };
+  return { accessToken, refreshToken: newRefreshToken, session: newSession };
 };
 
-export const logoutUser = async (refreshToken) => {
-  await Session.deleteOne({ refreshToken });
+export const logoutUser = async (refreshToken, sessionId) => {
+  await Session.deleteOne({ _id: sessionId, refreshToken });
 };

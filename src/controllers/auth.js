@@ -4,6 +4,7 @@ import * as authService from '../services/auth.js';
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
   const user = await authService.registerUser({ name, email, password });
+
   res.status(201).json({
     status: 201,
     message: 'Successfully registered a user!',
@@ -13,26 +14,46 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  const tokens = await authService.loginUser({ email, password });
 
-  res.cookie('refreshToken', tokens.refreshToken, {
+  const { accessToken, refreshToken, session } = await authService.loginUser({ email, password });
+
+  res.cookie('sessionId', session._id, {
     httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000, 
+    secure: true,
+    sameSite: 'None',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 
   res.status(200).json({
     status: 200,
     message: 'Successfully logged in a user!',
-    data: { accessToken: tokens.accessToken },
+    data: { accessToken },
   });
 };
 
 export const refresh = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  const tokens = await authService.refreshSession(refreshToken);
+  const { refreshToken, sessionId } = req.cookies;
+
+  const tokens = await authService.refreshSession(refreshToken, sessionId);
+
+  res.cookie('sessionId', tokens.session._id, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
 
   res.cookie('refreshToken', tokens.refreshToken, {
     httpOnly: true,
+    secure: true,
+    sameSite: 'None',
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 
@@ -44,8 +65,12 @@ export const refresh = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  await authService.logoutUser(refreshToken);
+  const { refreshToken, sessionId } = req.cookies;
+
+  await authService.logoutUser(refreshToken, sessionId);
+
   res.clearCookie('refreshToken');
+  res.clearCookie('sessionId');
+
   res.status(204).send();
 };
