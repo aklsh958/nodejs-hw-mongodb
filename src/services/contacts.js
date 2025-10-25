@@ -4,6 +4,7 @@ export const getAllContactsService = async ({ page, perPage, sortBy, sortOrder, 
   const skip = (page - 1) * perPage;
   const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
+  // Переконайся, що фільтр містить userId
   const contacts = await ContactsCollection.find(filter)
     .sort(sort)
     .skip(skip)
