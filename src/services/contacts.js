@@ -1,12 +1,6 @@
 import { ContactsCollection } from '../models/contact.js';
 
-export const getAllContactsService = async ({
-  page = 1,
-  perPage = 10,
-  sortBy = 'name',
-  sortOrder = 'asc',
-  filter = {},
-}) => {
+export const getAllContactsService = async ({ page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', filter = {} }) => {
   const skip = (page - 1) * perPage;
   const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
