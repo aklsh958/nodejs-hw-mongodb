@@ -1,10 +1,15 @@
 import { ContactsCollection } from '../models/contact.js';
 
-export const getAllContactsService = async ({ page, perPage, sortBy, sortOrder, filter }) => {
+export const getAllContactsService = async ({
+  page = 1,
+  perPage = 10,
+  sortBy = 'name',
+  sortOrder = 'asc',
+  filter = {},
+}) => {
   const skip = (page - 1) * perPage;
   const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  // Переконайся, що фільтр містить userId
   const contacts = await ContactsCollection.find(filter)
     .sort(sort)
     .skip(skip)
@@ -29,7 +34,11 @@ export const createContactService = async (data) => {
 };
 
 export const updateContactService = async (contactId, userId, data) => {
-  return await ContactsCollection.findOneAndUpdate({ _id: contactId, userId }, data, { new: true });
+  return await ContactsCollection.findOneAndUpdate(
+    { _id: contactId, userId },
+    data,
+    { new: true },
+  );
 };
 
 export const deleteContactService = async (contactId, userId) => {
