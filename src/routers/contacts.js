@@ -4,24 +4,29 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { uploadSingle } from '../middlewares/uploadMiddleware.js';
+import Joi from 'joi';
+
 import {
   getAllContacts,
   getContactById,
   createContact,
   updateContact,
   deleteContact,
-} from '../controllers/contacts.js';
-import Joi from 'joi';
+} from '../controllers/contactsController.js';
 
 const router = express.Router();
+
+// Авторизація для всіх маршрутів
 router.use(authenticate);
 
+// Схеми валідації
 const contactSchema = Joi.object({
   name: Joi.string().min(3).max(20).required(),
   phoneNumber: Joi.string().min(3).max(20).required(),
   email: Joi.string().email().optional(),
   isFavourite: Joi.boolean().optional(),
   contactType: Joi.string().valid('work', 'home', 'personal').required(),
+  photo: Joi.string().optional(),
 });
 
 const contactUpdateSchema = Joi.object({
@@ -30,12 +35,28 @@ const contactUpdateSchema = Joi.object({
   email: Joi.string().email().optional(),
   isFavourite: Joi.boolean().optional(),
   contactType: Joi.string().valid('work', 'home', 'personal').optional(),
+  photo: Joi.string().optional(),
 });
 
+// Роути
 router.get('/', ctrlWrapper(getAllContacts));
 router.get('/:contactId', isValidId, ctrlWrapper(getContactById));
-router.post('/', uploadSingle('photo'), validateBody(contactSchema), ctrlWrapper(createContact));
-router.patch('/:contactId', isValidId, uploadSingle('photo'), validateBody(contactUpdateSchema), ctrlWrapper(updateContact));
+
+router.post(
+  '/',
+  uploadSingle('photo'),
+  validateBody(contactSchema),
+  ctrlWrapper(createContact)
+);
+
+router.patch(
+  '/:contactId',
+  isValidId,
+  uploadSingle('photo'),
+  validateBody(contactUpdateSchema),
+  ctrlWrapper(updateContact)
+);
+
 router.delete('/:contactId', isValidId, ctrlWrapper(deleteContact));
 
 export default router;

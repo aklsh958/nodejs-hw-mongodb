@@ -6,7 +6,9 @@ const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  if (!['.jpg', '.jpeg', '.png'].includes(ext)) return cb(createHttpError(400, 'Only images are allowed'));
+  if (!['.jpg', '.jpeg', '.png'].includes(ext)) {
+    return cb(createHttpError(400, 'Only images are allowed'));
+  }
   cb(null, true);
 };
 
