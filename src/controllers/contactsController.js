@@ -4,7 +4,15 @@ import { uploadToCloudinary } from '../utils/cloudinary.js';
 
 export const getAllContacts = async (req, res) => {
   const { _id: userId } = req.user;
-  const { page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', type, isFavourite } = req.query;
+
+  const {
+    page = 1,
+    perPage = 10,
+    sortBy = 'name',
+    sortOrder = 'asc',
+    type,
+    isFavourite,
+  } = req.query;
 
   const filter = { userId };
   if (type) filter.contactType = type;
@@ -41,11 +49,11 @@ export const getContactById = async (req, res) => {
 
 export const createContact = async (req, res) => {
   const { _id: userId } = req.user;
-  let photoUrl = null;
 
+  let photoUrl = null;
   if (req.file) {
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
-    photoUrl = uploadResult.secure_url;
+    const uploadResult = await uploadToCloudinary(req.file.buffer); 
+    photoUrl = uploadResult;
   }
 
   const newContact = await contactsService.createContactService({
@@ -65,11 +73,10 @@ export const updateContact = async (req, res) => {
   const { contactId } = req.params;
   const { _id: userId } = req.user;
 
-  let photoUrl = req.body.photo || null;
-
+  let photoUrl = req.body.photo;
   if (req.file) {
     const uploadResult = await uploadToCloudinary(req.file.buffer);
-    photoUrl = uploadResult.secure_url;
+    photoUrl = uploadResult;
   }
 
   const updated = await contactsService.updateContactService(contactId, userId, {
