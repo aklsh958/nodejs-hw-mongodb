@@ -1,104 +1,64 @@
-import createHttpError from 'http-errors';
-import * as contactsService from '../services/contacts.js';
-import { uploadToCloudinary } from '../utils/cloudinary.js';
+import createHttpError from "http-errors";
+import Contact from "../models/contact.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
-export const getAllContacts = async (req, res) => {
-  const { _id: userId } = req.user;
+export const createContact = async (req, res, next) => {
+  try {
+    const { name, email, phone, contactType } = req.body;
+    const owner = req.user._id;
 
-  const {
-    page = 1,
-    perPage = 10,
-    sortBy = 'name',
-    sortOrder = 'asc',
-    type,
-    isFavourite,
-  } = req.query;
+    let photoUrl = null;
 
-  const filter = { userId };
-  if (type) filter.contactType = type;
-  if (isFavourite !== undefined) filter.isFavourite = isFavourite === 'true';
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.path);
+      photoUrl = uploadResult.secure_url; 
+    }
 
-  const contactsData = await contactsService.getAllContactsService({
-    page,
-    perPage,
-    sortBy,
-    sortOrder,
-    filter,
-  });
+    const newContact = await Contact.create({
+      name,
+      email,
+      phone,
+      contactType,
+      photo: photoUrl,
+      owner,
+    });
 
-  res.json({
-    status: 200,
-    message: 'Successfully found contacts!',
-    data: contactsData,
-  });
-};
-
-export const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const { _id: userId } = req.user;
-
-  const contact = await contactsService.getContactByIdService(contactId, userId);
-  if (!contact) throw createHttpError(404, 'Contact not found');
-
-  res.json({
-    status: 200,
-    message: 'Successfully fetched contact!',
-    data: contact,
-  });
-};
-
-export const createContact = async (req, res) => {
-  const { _id: userId } = req.user;
-
-  let photoUrl = null;
-  if (req.file) {
-    const uploadResult = await uploadToCloudinary(req.file.buffer); 
-    photoUrl = uploadResult;
+    res.status(201).json({
+      status: 201,
+      message: "Contact created successfully",
+      data: newContact,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const newContact = await contactsService.createContactService({
-    ...req.body,
-    userId,
-    photo: photoUrl,
-  });
-
-  res.status(201).json({
-    status: 201,
-    message: 'Successfully created a contact!',
-    data: newContact,
-  });
 };
 
-export const updateContact = async (req, res) => {
-  const { contactId } = req.params;
-  const { _id: userId } = req.user;
+export const updateContact = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const { name, email, phone, contactType } = req.body;
 
-  let photoUrl = req.body.photo;
-  if (req.file) {
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
-    photoUrl = uploadResult;
+    let updatedData = { name, email, phone, contactType };
+
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.path);
+      updatedData.photo = uploadResult.secure_url; 
+    }
+
+    const updatedContact = await Contact.findByIdAndUpdate(contactId, updatedData, {
+      new: true,
+    });
+
+    if (!updatedContact) {
+      throw createHttpError(404, "Contact not found");
+    }
+
+    res.json({
+      status: 200,
+      message: "Contact updated successfully",
+      data: updatedContact,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const updated = await contactsService.updateContactService(contactId, userId, {
-    ...req.body,
-    photo: photoUrl,
-  });
-
-  if (!updated) throw createHttpError(404, 'Contact not found');
-
-  res.json({
-    status: 200,
-    message: 'Successfully patched a contact!',
-    data: updated,
-  });
-};
-
-export const deleteContact = async (req, res) => {
-  const { contactId } = req.params;
-  const { _id: userId } = req.user;
-
-  const deleted = await contactsService.deleteContactService(contactId, userId);
-  if (!deleted) throw createHttpError(404, 'Contact not found');
-
-  res.status(204).send();
 };
