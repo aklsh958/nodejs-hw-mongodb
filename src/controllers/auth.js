@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import User from "../models/User.js";
-import { sendEmail } from "../utils/sendEmail.js";
+import { sendEmail } from "../utils/email.js";
 import jwt from "jsonwebtoken";
 
 export const resetPasswordRequest = async (req, res, next) => {
