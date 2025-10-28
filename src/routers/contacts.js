@@ -1,5 +1,5 @@
 import express from "express";
-import { createContact, updateContact } from "../controllers/contacts.js";
+import { createContact, updateContact } from "../controllers/contactsController.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import uploadMiddleware from "../middlewares/uploadMiddleware.js";
 
