@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import Contact from "../models/contact.js";
+import { Contact } from "../models/contact.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 export const createContact = async (req, res, next) => {
