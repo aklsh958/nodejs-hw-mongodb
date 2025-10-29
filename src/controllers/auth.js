@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
-import { sendEmail } from "../utils/sendEmail.js";
+import { sendEmail } from "../utils/email.js";
 import jwt from "jsonwebtoken";
 
 export const resetPassword = async (req, res, next) => {
