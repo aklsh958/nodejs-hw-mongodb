@@ -1,13 +1,22 @@
-import multer from 'multer';
-import path from 'path';
-import createHttpError from 'http-errors';
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
-const storage = multer.memoryStorage();
+const tempDir = path.resolve("temp");
 
-const fileFilter = (req, file, cb) => {
-  const ext = path.extname(file.originalname).toLowerCase();
-  if (!['.jpg', '.jpeg', '.png'].includes(ext)) return cb(createHttpError(400, 'Only images are allowed'));
-  cb(null, true);
-};
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir);
+}
 
-export const uploadSingle = (fieldName) => multer({ storage, fileFilter }).single(fieldName);
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, tempDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage });
+
+export default upload;
