@@ -1,11 +1,10 @@
-import createHttpError from "http-errors";
 import { Contact } from "../models/contact.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
 
 export const createContact = async (req, res, next) => {
   try {
-    const { name, email, phone, contactType } = req.body;
-    const owner = req.user._id;
+    const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+    const userId = req.user._id;
 
     let photoUrl = null;
 
@@ -14,20 +13,17 @@ export const createContact = async (req, res, next) => {
       photoUrl = uploadResult.secure_url; 
     }
 
-    const newContact = await Contact.create({
+    const contact = await Contact.create({
       name,
+      phoneNumber,
       email,
-      phone,
+      isFavourite,
       contactType,
       photo: photoUrl,
-      owner,
+      userId,
     });
 
-    res.status(201).json({
-      status: 201,
-      message: "Contact created successfully",
-      data: newContact,
-    });
+    res.status(201).json(contact);
   } catch (error) {
     next(error);
   }
@@ -36,28 +32,25 @@ export const createContact = async (req, res, next) => {
 export const updateContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const { name, email, phone, contactType } = req.body;
 
-    let updatedData = { name, email, phone, contactType };
+    let photoUrl = req.body.photo;
 
     if (req.file) {
       const uploadResult = await uploadToCloudinary(req.file.path);
-      updatedData.photo = uploadResult.secure_url; 
+      photoUrl = uploadResult.secure_url;
     }
 
-    const updatedContact = await Contact.findByIdAndUpdate(contactId, updatedData, {
-      new: true,
-    });
+    const updatedContact = await Contact.findByIdAndUpdate(
+      contactId,
+      { ...req.body, photo: photoUrl },
+      { new: true }
+    );
 
     if (!updatedContact) {
-      throw createHttpError(404, "Contact not found");
+      return res.status(404).json({ message: "Contact not found" });
     }
 
-    res.json({
-      status: 200,
-      message: "Contact updated successfully",
-      data: updatedContact,
-    });
+    res.json(updatedContact);
   } catch (error) {
     next(error);
   }

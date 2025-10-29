@@ -1,9 +1,9 @@
 import express from "express";
-import { resetPasswordRequest, resetPasswordConfirm } from "../controllers/auth.js";
+import { resetPassword, setNewPassword } from "../controllers/auth.js";
 
 const router = express.Router();
 
-router.post("/reset-pwd", resetPasswordRequest);
-router.post("/reset-pwd/confirm", resetPasswordConfirm);
+router.post("/reset-pwd", resetPassword);
+router.post("/new-pwd", setNewPassword);
 
 export default router;
