@@ -1,17 +1,15 @@
-import express from "express";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import authRouter from "./routers/auth.js";
+import 'dotenv/config.js';
+import { setupServer } from './server.js';
+import { initMongoConnection } from './db/initMongoConnection.js';
 
-dotenv.config();
+async function bootstrap() {
+  try {
+    await initMongoConnection();
+    setupServer();
+  } catch (error) {
+    console.error('❌ Error starting server:', error.message);
+    process.exit(1);
+  }
+}
 
-const app = express();
-
-app.use(express.json());
-app.use(cookieParser());
-
-app.use("/auth", authRouter);
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
+bootstrap();
