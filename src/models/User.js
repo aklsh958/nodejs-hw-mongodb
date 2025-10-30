@@ -17,8 +17,16 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    sessionId: {
+      type: String,
+      default: null,
+    },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 export const User = model('User', userSchema);

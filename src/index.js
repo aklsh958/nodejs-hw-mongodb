@@ -1,11 +1,17 @@
-import 'dotenv/config';
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import authRouter from "./routers/auth.js";
 
-import { setupServer } from './server.js';
-import { initMongoConnection } from './db/initMongoConnection.js';
+dotenv.config();
 
-async function bootstrap() {
-  await initMongoConnection();
-  setupServer();
-}
+const app = express();
 
-bootstrap();
+app.use(express.json());
+app.use(cookieParser());
+
+app.use("/auth", authRouter);
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
+});
