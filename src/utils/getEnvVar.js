@@ -1,7 +1,4 @@
-// src/utils/getEnvVar.js
-
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 export function getEnvVar(name, defaultValue) {

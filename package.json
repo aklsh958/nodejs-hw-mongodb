@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-hw-mongodb",
+  "name": "nodejs-hw-06",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iryna-kleimonova/nodejs-hw-mongodb.git"
+    "url": "git+https://github.com/aklsh958/nodejs-hw-mongodb.git"
   },
   "keywords": [],
-  "author": "Iryna Kleimonova <semikiriina@gmail.com>",
+  "author": "Artem Kulish <akulish247@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/iryna-kleimonova/nodejs-hw-mongodb/issues"
+    "url": "https://github.com/aklsh958/nodejs-hw-mongodb/issues"
   },
-  "homepage": "https://github.com/iryna-kleimonova/nodejs-hw-mongodb#readme",
-  "description": "",
+  "homepage": "https://github.com/aklsh958/nodejs-hw-mongodb#readme",
+  "description": "Homework 6 - Email and Images",
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "eslint": "^9.35.0",
