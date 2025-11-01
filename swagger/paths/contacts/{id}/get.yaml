@@ -1,0 +1,39 @@
+tags:
+  - Contacts
+summary: Get contact by id
+operationId: getContactById
+description: Get a single contact by its unique identifier. Only the authenticated user's own contacts can be accessed.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: contactId
+    required: true
+    schema:
+      type: string
+      example: '65ca67e7ae7f10c88b598384'
+    description: The unique identifier of the contact
+responses:
+  '200':
+    description: Successfully got contact
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully found contact with id 65e4decdd286b30065d54af9!
+            data:
+              $ref: ../../../components/schemas/contact.yaml
+  '401':
+    $ref: ../../../components/responses/401.yaml
+  '404':
+    $ref: ../../../components/responses/404.yaml

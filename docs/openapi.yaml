@@ -1,0 +1,74 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Node.js Contacts API - Artem Kulish
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: |
+    REST API for managing contacts, with authentication, password reset via email (Brevo),
+    and image uploads (Cloudinary).
+
+    ## Features
+    User registration and authentication (JWT)
+    Password reset via email
+    Contact CRUD operations
+    Image uploads via Cloudinary
+    Filtering, sorting, and pagination
+
+  contact:
+    name: Artem Kulish
+    email: akulish247@gmail.com
+    url: https://github.com/aklsh958/nodejs-hw-mongodb
+
+tags:
+  - name: Auth
+    description: Authentication and password reset endpoints
+  - name: Contacts
+    description: CRUD and image upload for contacts
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://nodejs-hw-mongodb.onrender.com
+    description: Production server (Render deployment)
+
+paths:
+  /auth/register:
+    post:
+      $ref: ./paths/auth/register.yaml
+  /auth/login:
+    post:
+      $ref: ./paths/auth/login.yaml
+  /auth/refresh:
+    post:
+      $ref: ./paths/auth/refresh.yaml
+  /auth/logout:
+    post:
+      $ref: ./paths/auth/logout.yaml
+  /auth/send-reset-email:
+    post:
+      $ref: ./paths/auth/send-reset-email.yaml
+  /auth/reset-pwd:
+    post:
+      $ref: ./paths/auth/reset-pwd.yaml
+
+  /contacts:
+    get:
+      $ref: ./paths/contacts/get.yaml
+    post:
+      $ref: ./paths/contacts/post.yaml
+  /contacts/{contactId}:
+    get:
+      $ref: ./paths/contacts/{id}/get.yaml
+    patch:
+      $ref: ./paths/contacts/{id}/patch.yaml
+    delete:
+      $ref: ./paths/contacts/{id}/delete.yaml
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
